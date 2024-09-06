@@ -1,0 +1,16 @@
+{
+  "name": "ecopaste-updater",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev":"vercel"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "16",
+    "@vercel/node": "^3.2.12",
+    "typescript": "^5.5.4"
+  }
+}
