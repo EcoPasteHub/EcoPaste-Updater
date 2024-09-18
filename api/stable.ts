@@ -6,6 +6,7 @@ interface Asset {
 }
 
 interface IResponse {
+  tag_name: string;
   assets: Asset[];
 }
 
@@ -21,10 +22,16 @@ const PLATFORM = {
 export default async (req: VercelRequest, res: VercelResponse) => {
   try {
     const response = await fetch(
-      "https://api.github.com/repos/EcoPasteHub/EcoPaste/releases/latest"
+      "https://api.github.com/repos/EcoPasteHub/EcoPaste/releases"
     );
 
-    const result: IResponse = await response.json();
+    const result: IResponse[] = await response.json();
+
+    const latestStable = result.find(({ tag_name }) => !tag_name.includes("-"));
+
+    if (!latestStable) {
+      return res.send("未找到最新的稳定版本");
+    }
 
     const { platform } = req.query;
 
@@ -34,7 +41,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
       return res.send(`请正确的传入 platform 参数：${platforms.join("、")}`);
     }
 
-    const url = getDownloadURL(platform, result.assets);
+    const url = getDownloadURL(platform, latestStable.assets);
 
     if (!url) {
       return res.send(`未找到 ${platform} 平台的安装包`);
