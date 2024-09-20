@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-export default async (_: VercelRequest, res: VercelResponse) => {
+export default async (req: VercelRequest, res: VercelResponse) => {
   try {
     const response = await fetch(
       "https://api.github.com/repos/EcoPasteHub/EcoPaste/releases"
@@ -8,8 +8,16 @@ export default async (_: VercelRequest, res: VercelResponse) => {
 
     const result = await response.json();
 
+    const joinBeta = req.headers["join-beta"];
+
+    let version = result[0].name;
+
+    if (joinBeta === "false") {
+      version = result.find(({ name }) => !name.includes("-")).name;
+    }
+
     res.redirect(
-      `https://gh-proxy.com/https://github.com/EcoPasteHub/EcoPaste/releases/download/${result[0].name}/latest.json`
+      `https://gh-proxy.com/https://github.com/EcoPasteHub/EcoPaste/releases/download/${version}/latest.json`
     );
   } catch (error) {
     res.status(500).send(error);
